@@ -1,0 +1,40 @@
+name: Build THE BILLIARD APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter project
+        run: flutter create --project-name the_billiard build_app
+
+      - name: Add THE BILLIARD code
+        run: cp main.dart build_app/lib/main.dart
+
+      - name: Install packages
+        working-directory: build_app
+        run: flutter pub add shared_preferences
+
+      - name: Build APK
+        working-directory: build_app
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: THE-BILLIARD-APK
+          path: build_app/build/app/outputs/flutter-apk/app-release.apk
